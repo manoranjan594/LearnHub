@@ -1,20 +1,32 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>LearnHub - Online Learning Platform</title>
+  <meta name="description" content="LearnHub is an online learning platform for courses, lectures, quizzes, assignments, and progress tracking.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Corrected: styles.css is in the repository root -->
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="index.html" class="nav-brand">📚 LearnHub</a>
+
       <div class="nav-links" id="navLinks">
         <a href="courses.html">Courses</a>
-        <a href="index.html#login" id="loginLink">Sign In</a>
-        <a href="index.html#signup" class="btn btn-primary btn-sm" id="signupLink">Get Started</a>
+        <a href="#login" id="loginLink">Sign In</a>
+        <a href="#signup" class="btn btn-primary btn-sm" id="signupLink">
+          Get Started
+        </a>
       </div>
     </div>
   </nav>
@@ -23,115 +35,214 @@
     <section class="hero">
       <div class="container">
         <h1>Learn Anything, Anywhere</h1>
-        <p>Access courses, lectures, quizzes, and assignments. Track your progress, engage in discussions, and achieve your learning goals.</p>
-        <a href="courses.html" class="btn btn-primary">Browse Courses</a>
+
+        <p>
+          Access courses, lectures, quizzes, and assignments.
+          Track your progress, engage in discussions, and achieve
+          your learning goals.
+        </p>
+
+        <a href="courses.html" class="btn btn-primary">
+          Browse Courses
+        </a>
       </div>
     </section>
 
     <section class="container" style="padding-top: 0;">
       <h2 class="section-title text-center">Features</h2>
+
       <div class="card-grid" style="margin-top: 24px;">
         <div class="card">
-          <h3 style="margin-bottom: 8px;">📖 Courses & Lectures</h3>
-          <p class="text-muted">Access structured courses with video lectures and learning materials.</p>
+          <h3 style="margin-bottom: 8px;">📖 Courses &amp; Lectures</h3>
+          <p class="text-muted">
+            Access structured courses with video lectures and learning materials.
+          </p>
         </div>
+
         <div class="card">
-          <h3 style="margin-bottom: 8px;">✅ Quizzes & Assignments</h3>
-          <p class="text-muted">Test your knowledge with quizzes and hands-on assignments.</p>
+          <h3 style="margin-bottom: 8px;">✅ Quizzes &amp; Assignments</h3>
+          <p class="text-muted">
+            Test your knowledge with quizzes and hands-on assignments.
+          </p>
         </div>
+
         <div class="card">
           <h3 style="margin-bottom: 8px;">📊 Progress Tracking</h3>
-          <p class="text-muted">Track your completion and stay motivated with visual progress.</p>
+          <p class="text-muted">
+            Track your completion and stay motivated with visual progress.
+          </p>
         </div>
+
         <div class="card">
           <h3 style="margin-bottom: 8px;">💬 Discussion Forums</h3>
-          <p class="text-muted">Connect with peers and instructors in course discussion forums.</p>
+          <p class="text-muted">
+            Connect with peers and instructors in course discussion forums.
+          </p>
         </div>
       </div>
     </section>
 
+    <!-- Sign In -->
     <section class="container auth-page" id="login" style="padding: 48px 24px;">
       <div class="auth-card">
         <h1>Sign In</h1>
         <p>Access your learning dashboard</p>
+
         <form id="loginForm">
           <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="loginEmail" placeholder="you@example.com" required>
+            <label for="loginEmail">Email</label>
+            <input
+              type="email"
+              id="loginEmail"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            >
           </div>
+
           <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="loginPassword" placeholder="••••••••" required>
+            <label for="loginPassword">Password</label>
+            <input
+              type="password"
+              id="loginPassword"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            >
           </div>
-          <button type="submit" class="btn btn-primary">Sign In</button>
+
+          <button type="submit" class="btn btn-primary">
+            Sign In
+          </button>
         </form>
+
         <div class="divider"><span>or</span></div>
-        <p class="text-center text-muted">Don't have an account? <a href="#signup" id="goSignup">Sign up</a></p>
+
+        <p class="text-center text-muted">
+          Don't have an account?
+          <a href="#signup" id="goSignup">Sign up</a>
+        </p>
       </div>
     </section>
 
+    <!-- Create Account -->
     <section class="container auth-page" id="signup" style="padding: 48px 24px;">
       <div class="auth-card">
         <h1>Create Account</h1>
         <p>Start your learning journey</p>
+
         <form id="signupForm">
           <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="signupName" placeholder="Your name" required>
+            <label for="signupName">Full Name</label>
+            <input
+              type="text"
+              id="signupName"
+              placeholder="Your name"
+              autocomplete="name"
+              required
+            >
           </div>
+
           <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="signupEmail" placeholder="you@example.com" required>
+            <label for="signupEmail">Email</label>
+            <input
+              type="email"
+              id="signupEmail"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            >
           </div>
+
           <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="signupPassword" placeholder="••••••••" required minlength="6">
+            <label for="signupPassword">Password</label>
+            <input
+              type="password"
+              id="signupPassword"
+              placeholder="At least 6 characters"
+              autocomplete="new-password"
+              minlength="6"
+              required
+            >
           </div>
-          <button type="submit" class="btn btn-primary">Create Account</button>
+
+          <button type="submit" class="btn btn-primary">
+            Create Account
+          </button>
         </form>
+
         <div class="divider"><span>or</span></div>
-        <p class="text-center text-muted">Already have an account? <a href="#login" id="goLogin">Sign in</a></p>
+
+        <p class="text-center text-muted">
+          Already have an account?
+          <a href="#login" id="goLogin">Sign in</a>
+        </p>
       </div>
     </section>
   </main>
 
+  <!-- Corrected: data.js is in the repository root -->
   <script src="data.js"></script>
+
   <script>
-    const user = getCurrentUser();
-    if (user) {
+    // Check whether a user is already signed in.
+    const currentUser = getCurrentUser();
+
+    if (currentUser) {
       window.location.href = 'dashboard.html';
     }
 
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-      e.preventDefault();
+    // Sign In
+    document.getElementById('loginForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
       const users = getUsers();
-      const email = document.getElementById('loginEmail').value;
+      const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
-      const u = users.find(x => x.email === email && x.password === password);
-      if (u) {
-        setCurrentUser({ ...u, password: undefined });
+
+      const matchedUser = users.find(function (user) {
+        return user.email === email && user.password === password;
+      });
+
+      if (matchedUser) {
+        const { password: savedPassword, ...safeUser } = matchedUser;
+        setCurrentUser(safeUser);
         window.location.href = 'dashboard.html';
       } else {
         alert('Invalid email or password.');
       }
     });
 
-    document.getElementById('signupForm').addEventListener('submit', (e) => {
-      e.preventDefault();
+    // Create Account
+    document.getElementById('signupForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
       const users = getUsers();
-      const email = document.getElementById('signupEmail').value;
-      if (users.some(u => u.email === email)) {
-        alert('Email already registered.');
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+
+      const emailExists = users.some(function (user) {
+        return user.email.toLowerCase() === email.toLowerCase();
+      });
+
+      if (emailExists) {
+        alert('This email is already registered. Please sign in.');
         return;
       }
-      const user = {
+
+      const newUser = {
         id: Date.now().toString(),
-        name: document.getElementById('signupName').value,
-        email,
-        password: document.getElementById('signupPassword').value,
+        name: name,
+        email: email,
+        password: password
       };
-      saveUser(user);
-      setCurrentUser({ ...user, password: undefined });
+
+      saveUser(newUser);
+
+      const { password: savedPassword, ...safeUser } = newUser;
+      setCurrentUser(safeUser);
+
       window.location.href = 'dashboard.html';
     });
   </script>
