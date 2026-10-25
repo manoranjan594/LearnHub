@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course - LearnHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="dashboard.html" class="nav-brand">📚 LearnHub</a>
+      <div class="nav-links">
+        <a href="courses.html">Courses</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html" class="btn btn-secondary btn-sm" id="authBtn">Sign In</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header" id="courseHeader">
+      <h1 id="courseTitle">Loading...</h1>
+      <p id="courseMeta"></p>
+      <div id="enrollArea"></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="lectures">Lectures</button>
+      <button class="tab" data-tab="quizzes">Quizzes</button>
+      <button class="tab" data-tab="assignments">Assignments</button>
+      <button class="tab" data-tab="forum">Discussion Forum</button>
+    </div>
+
+    <div id="lectures" class="tab-content">
+      <div class="card" id="lecturesList"></div>
+    </div>
+
+    <div id="quizzes" class="tab-content" style="display:none;">
+      <div id="quizzesList"></div>
+    </div>
+
+    <div id="assignments" class="tab-content" style="display:none;">
+      <div id="assignmentsList"></div>
+    </div>
+
+    <div id="forum" class="tab-content" style="display:none;">
+      <div class="card mb-2">
+        <form id="forumForm">
+          <div class="form-group">
+            <label>Post a question or discussion</label>
+            <textarea id="forumInput" rows="3" placeholder="Share your thoughts..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Post</button>
+        </form>
+      </div>
+      <div id="forumPosts"></div>
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const courseId = params.get('id');
+    const user = getCurrentUser();
+
+    if (!courseId) {
+      window.location.href = 'courses.html';
+    }
+
+    if (user) {
+      document.getElementById('authBtn').href = 'dashboard.html';
+      document.getElementById('authBtn').textContent = 'Dashboard';
+    }
+
+    const course = getCourse(courseId);
+    const content = getCourseContent(courseId);
+
+    if (!course) {
+      document.getElementById('courseTitle').textContent = 'Course not found';
+    } else {
+      document.getElementById('courseTitle').textContent = course.title;
+      document.getElementById('courseMeta').textContent = `${course.instructor} · ${course.duration} · ${course.level}`;
+
+      const isEn = user && isEnrolled(user.id, courseId);
+      const prog = user ? getCourseProgress(user.id, courseId) : null;
+
+      if (!user) {
+        document.getElementById('enrollArea').innerHTML = '<p class="text-muted">Sign in to enroll in this course.</p>';
+      } else if (!isEn) {
+        document.getElementById('enrollArea').innerHTML = `
+          <button class="btn btn-primary" id="enrollBtn">Enroll in this Course</button>
+        `;
+        document.getElementById('enrollBtn').addEventListener('click', () => {
+          enrollUser(user.id, courseId);
+          location.reload();
+        });
+      } else {
+        document.getElementById('enrollArea').innerHTML = `
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--primary) ${prog.percent}%, var(--bg-input) 0);display:flex;align-items:center;justify-content:center;">
+              <div style="width:64px;height:64px;background:var(--bg-card);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">${prog.percent}%</div>
+            </div>
+            <span class="text-muted">${prog.done} of ${prog.total} completed</span>
+          </div>
+        `;
+      }
+    }
+
+    // Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).style.display = 'block';
+      });
+    });
+
+    // Lectures
+    const p = user ? getProgress()[`${user.id}_${courseId}`] : { lectures: [] };
+    document.getElementById('lecturesList').innerHTML = (content.lectures || []).map((l, i) => {
+      const done = p.lectures && p.lectures.includes(l.id);
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <span style="margin-right:8px;">${done ? '✅' : '▶️'}</span>
+            <strong>${l.title}</strong>
+            <span class="text-muted" style="font-size:0.85rem">${l.duration}</span>
+          </div>
+          ${user && isEn ? `<button class="btn btn-sm ${done ? 'btn-secondary' : 'btn-primary'}" data-lecture="${l.id}">${done ? 'Done' : 'Mark Complete'}</button>` : ''}
+        </div>
+      `;
+    }).join('') || '<p class="text-muted">No lectures yet.</p>';
+
+    document.getElementById('lecturesList').querySelectorAll('[data-lecture]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        updateProgress(user.id, courseId, 'lecture', btn.dataset.lecture);
+        location.reload();
+      });
+    });
+
+    // Quizzes
+    const quizHtml = (content.quizzes || []).map(q => {
+      const done = p.quizzes && p.quizzes[q.id];
+      return `
+        <div class="card mb-2">
+          <h3>${q.title}</h3>
+          ${done ? '<p class="text-muted">✓ Completed</p>' : `
+            <button class="btn btn-primary btn-sm mt-1" data-quiz="${q.id}">Take Quiz</button>
+          `}
+        </div>
+      `;
+    }).join('') || '<p class="text-muted">No quizzes yet.</p>';
+    document.getElementById('quizzesList').innerHTML = quizHtml;
+
+    document.getElementById('quizzesList').addEventListener('click', (e) => {
+      const bid = e.target.dataset.quiz;
+      if (!bid) return;
+      const q = (content.quizzes || []).find(x => x.id === bid);
+      if (!q) return;
+      runQuiz(q);
+    });
+
+    function runQuiz(quiz) {
+      let idx = 0;
+      let score = 0;
+      const run = () => {
+        if (idx >= quiz.questions.length) {
+          updateProgress(user.id, courseId, 'quiz', quiz.id);
+          alert(`Quiz complete! Score: ${score}/${quiz.questions.length}`);
+          location.reload();
+          return;
+        }
+        const q = quiz.questions[idx];
+        const ans = prompt(q.q + '\n\n' + q.options.map((o, i) => `${i + 1}. ${o}`).join('\n') + '\n\nEnter 1, 2, or 3:');
+        if (ans && parseInt(ans) === q.correct + 1) score++;
+        idx++;
+        run();
+      };
+      run();
+    }
+
+    // Assignments
+    const assignP = p.assignments || [];
+    document.getElementById('assignmentsList').innerHTML = (content.assignments || []).map(a => {
+      const done = assignP.includes(a.id);
+      return `
+        <div class="card mb-2">
+          <h3>${a.title}</h3>
+          <p class="text-muted">${a.description}</p>
+          <p style="font-size:0.9rem">Due: ${a.dueDate}</p>
+          ${user && isEnrolled(user.id, courseId) ? `
+            <button class="btn btn-sm ${done ? 'btn-secondary' : 'btn-primary'} mt-1" data-assign="${a.id}">${done ? 'Submitted' : 'Mark Complete'}</button>
+          ` : ''}
+        </div>
+      `;
+    }).join('') || '<p class="text-muted">No assignments yet.</p>';
+
+    document.getElementById('assignmentsList').addEventListener('click', (e) => {
+      const bid = e.target.dataset.assign;
+      if (!bid) return;
+      updateProgress(user.id, courseId, 'assignment', bid);
+      location.reload();
+    });
+
+    // Forum
+    const posts = getForumPosts(courseId);
+    function renderForum() {
+      document.getElementById('forumPosts').innerHTML = posts.map(post => `
+        <div class="forum-post">
+          <div class="forum-post-header">
+            <span class="forum-post-author">${post.author || 'Anonymous'}</span>
+            <span class="forum-post-date">${new Date(post.date).toLocaleDateString()}</span>
+          </div>
+          <div class="forum-post-content">${post.content}</div>
+        </div>
+      `).join('') || '<p class="text-muted">No posts yet. Be the first to start a discussion!</p>';
+    }
+    renderForum();
+
+    document.getElementById('forumForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!user) {
+        alert('Sign in to post.');
+        return;
+      }
+      const content = document.getElementById('forumInput').value.trim();
+      addForumPost(courseId, { author: user.name, content });
+      posts.unshift({ author: user.name, content, date: new Date().toISOString() });
+      document.getElementById('forumInput').value = '';
+      renderForum();
+    });
+  </script>
+</body>
+</html>

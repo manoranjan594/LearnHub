@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - LearnHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="dashboard.html" class="nav-brand">📚 LearnHub</a>
+      <div class="nav-links">
+        <a href="courses.html">Courses</a>
+        <a href="profile.html">Profile</a>
+        <a href="#" class="btn btn-secondary btn-sm" id="logoutBtn">Sign Out</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>My Profile</h1>
+      <p>Manage your account and view your learning stats</p>
+    </div>
+
+    <div class="card" style="max-width: 480px;">
+      <form id="profileForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="profileName" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="profileEmail" readonly style="background:var(--bg-input);cursor:not-allowed;">
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </form>
+    </div>
+
+    <h2 class="section-title mt-2">Learning Stats</h2>
+    <div class="card-grid" id="statsGrid"></div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script>
+    const user = getCurrentUser();
+    if (!user) {
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('profileName').value = user.name || '';
+    document.getElementById('profileEmail').value = user.email || '';
+
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      setCurrentUser(null);
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('profileForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('profileName').value;
+      const users = getUsers();
+      const u = users.find(x => x.email === user.email);
+      if (u) {
+        u.name = name;
+        saveUser(u);
+        setCurrentUser({ ...user, name });
+        alert('Profile updated.');
+      }
+    });
+
+    const enrolled = getEnrollments()[user.id] || [];
+    const courses = getCourses().filter(c => enrolled.includes(c.id));
+    const stats = courses.map(c => ({
+      ...c,
+      progress: getCourseProgress(user.id, c.id)
+    }));
+
+    document.getElementById('statsGrid').innerHTML = stats.length
+      ? stats.map(s => `
+          <div class="card">
+            <h3>${s.icon} ${s.title}</h3>
+            <div class="progress-bar mt-1"><div class="progress-fill" style="width:${s.progress.percent}%"></div></div>
+            <p class="text-muted mt-1">${s.progress.percent}% complete</p>
+          </div>
+        `).join('')
+      : '<p class="text-muted">No enrolled courses. <a href="courses.html">Browse courses</a></p>';
+  </script>
+</body>
+</html>

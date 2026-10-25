@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - LearnHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="dashboard.html" class="nav-brand">📚 LearnHub</a>
+      <div class="nav-links">
+        <a href="courses.html">Courses</a>
+        <a href="profile.html">Profile</a>
+        <a href="#" class="btn btn-secondary btn-sm" id="logoutBtn">Sign Out</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Welcome back, <span id="userName">User</span></h1>
+      <p>Continue your learning journey</p>
+    </div>
+
+    <h2 class="section-title">My Courses</h2>
+    <div class="card-grid" id="enrolledCourses">
+      <p class="text-muted">No enrollments yet. <a href="courses.html">Browse courses</a></p>
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script>
+    const user = getCurrentUser();
+    if (!user) {
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('userName').textContent = user.name || 'Learner';
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      setCurrentUser(null);
+      window.location.href = 'index.html';
+    });
+
+    const enrolled = getEnrollments()[user.id] || [];
+    const container = document.getElementById('enrolledCourses');
+    if (enrolled.length === 0) {
+      container.innerHTML = '<p class="text-muted">No enrollments yet. <a href="courses.html">Browse courses</a></p>';
+    } else {
+      const courses = getCourses().filter(c => enrolled.includes(c.id));
+      container.innerHTML = courses.map(c => {
+        const prog = getCourseProgress(user.id, c.id);
+        return `
+          <a href="course.html?id=${c.id}" class="course-card" style="text-decoration:none;color:inherit;">
+            <div class="course-card-img">${c.icon}</div>
+            <div class="course-card-body">
+              <h3>${c.title}</h3>
+              <p class="meta">${c.instructor} · ${c.lessons} lessons</p>
+              <div class="progress-bar"><div class="progress-fill" style="width:${prog.percent}%"></div></div>
+              <p class="text-muted" style="font-size:0.85rem">${prog.percent}% complete</p>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

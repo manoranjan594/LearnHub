@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courses - LearnHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="dashboard.html" class="nav-brand">📚 LearnHub</a>
+      <div class="nav-links">
+        <a href="courses.html">Courses</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html" class="btn btn-secondary btn-sm" id="authBtn">Sign In</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Course Catalog</h1>
+      <p>Explore courses and start learning today</p>
+    </div>
+
+    <div class="card-grid" id="coursesList"></div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script>
+    const user = getCurrentUser();
+    if (user) {
+      document.getElementById('authBtn').href = 'dashboard.html';
+      document.getElementById('authBtn').textContent = 'Dashboard';
+    }
+
+    const courses = getCourses();
+    const enrolled = user ? (getEnrollments()[user.id] || []) : [];
+    document.getElementById('coursesList').innerHTML = courses.map(c => {
+      const isEn = user && isEnrolled(user.id, c.id);
+      const prog = user ? getCourseProgress(user.id, c.id) : { percent: 0 };
+      return `
+        <div class="course-card">
+          <div class="course-card-img">${c.icon}</div>
+          <div class="course-card-body">
+            <h3>${c.title}</h3>
+            <p class="meta">${c.instructor} · ${c.duration} · ${c.level}</p>
+            ${isEn ? `
+              <div class="progress-bar"><div class="progress-fill" style="width:${prog.percent}%"></div></div>
+              <a href="course.html?id=${c.id}" class="btn btn-primary btn-sm mt-1" style="display:inline-block;">Continue</a>
+            ` : `
+              <a href="course.html?id=${c.id}" class="btn btn-primary btn-sm mt-1" style="display:inline-block;">View Course</a>
+            `}
+          </div>
+        </div>
+      `;
+    }).join('');
+  </script>
+</body>
+</html>
